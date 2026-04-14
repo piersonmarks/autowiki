@@ -1,0 +1,17 @@
+# Obsidian workspace (per-machine UI state — never commit)
+.obsidian/workspace
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Python venvs (if the user runs extraction scripts locally)
+.venv/
+__pycache__/

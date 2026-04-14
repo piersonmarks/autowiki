@@ -1,0 +1,53 @@
+name: Nightly Synthesis
+
+# Runs the vault's nightly job — reads CLAUDE.md, synthesizes new sources into
+# the wiki, writes the daily recap, and pushes the resulting changes back.
+#
+# Schedule is in UTC. Adjust to hit your preferred local time.
+#   05:00 UTC  ≈  00:00 ET / 21:00 PT (previous day)   ← default
+#   06:00 UTC  ≈  01:00 ET / 22:00 PT (previous day)
+#   04:00 UTC  ≈  23:00 ET / 20:00 PT (previous day)
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  synthesize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout vault
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Python deps for source extraction
+        run: pip install --quiet python-docx pdfplumber pypdf
+
+      - name: Run nightly synthesis
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "Run the nightly job per CLAUDE.md."
+          claude_args: "--model claude-opus-4-6 --max-turns 100"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "claude-nightly[bot]"
+          git config user.email "claude-nightly[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "nightly synthesis: $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "No changes to commit."
+          fi

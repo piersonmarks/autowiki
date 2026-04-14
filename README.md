@@ -2,7 +2,7 @@
 
 > Your personal wiki, synthesized overnight.
 
-Drop articles, notes, and PDFs into an Obsidian vault during the day. A nightly GitHub Action uses Claude to turn the raw inputs into a cross-linked wiki and pushes it back. Wake up, pull, and read what your past self learned.
+Drop articles, notes, and PDFs into an Obsidian vault during the day. A nightly [Claude Code routine](https://docs.claude.com/en/docs/claude-code/routines) turns the raw inputs into a cross-linked wiki and pushes it back. Wake up, pull, and read what your past self learned.
 
 Inspired by [Andrej Karpathy's LLM wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
@@ -11,8 +11,8 @@ Inspired by [Andrej Karpathy's LLM wiki pattern](https://gist.github.com/karpath
 ```
              You (during the day)                Claude (overnight)
    ┌───────────────────────────────┐    ┌─────────────────────────────┐
-   │ Web Clipper → Raw/articles/   │    │ GitHub Action runs @ 05 UTC │
-   │ Drop PDFs   → Raw/files/      │    │ Reads CLAUDE.md             │
+   │ Web Clipper → Raw/articles/   │    │ Routine fires @ 05 UTC      │
+   │ Drop PDFs   → Raw/files/      │    │ Clones repo, reads CLAUDE.md│
    │ Jot notes   → Notes/          │    │ Synthesizes → Wiki/         │
    │ git push                      │    │ Writes Daily/YYYY-MM-DD.md  │
    └──────────────┬────────────────┘    │ git commit && git push      │
@@ -55,7 +55,7 @@ Then open your agent and say something like:
 set up an autowiki at ~/Desktop/MyVault
 ```
 
-The skill triggers, walks you through installing Obsidian, scaffolds the vault, wires up the GitHub Action, and hands you the remaining one-click steps (push to GitHub, install the Claude app, add your API key). You never leave the conversation.
+The skill triggers, walks you through installing Obsidian, scaffolds the vault, and hands you the remaining one-click steps (push to GitHub, create the routine with `/schedule`, toggle unrestricted branch pushes). You never leave the conversation.
 
 ### Alternative: manual clone into a Claude Code skills folder
 
@@ -70,13 +70,16 @@ Same trigger phrases work from there.
 ### What the skill walks you through
 
 1. Install [Obsidian](https://obsidian.md)
-2. Run the scaffolder — creates the folder structure, `CLAUDE.md`, and `.github/workflows/nightly-synthesis.yml`, then `git init`s and makes an initial commit
+2. Run the scaffolder — creates the folder structure, `CLAUDE.md`, and `.gitignore`, then `git init`s and makes an initial commit
 3. Open the vault in Obsidian
 4. Install the [Obsidian Web Clipper](https://obsidian.md/clipper) and point it at `Raw/articles/`
 5. Push the repo to GitHub (`gh repo create`)
-6. Install the [Claude GitHub app](https://github.com/apps/claude) on the repo
-7. Set `ANTHROPIC_API_KEY` as a repo secret (`gh secret set ANTHROPIC_API_KEY`)
-8. Kick off the workflow manually to verify (`gh workflow run nightly-synthesis.yml`)
+6. Create the nightly routine from inside Claude Code:
+   ```
+   /schedule daily at 05:00 UTC: Run the nightly job per CLAUDE.md.
+   ```
+7. At [claude.ai/code/routines](https://claude.ai/code/routines), edit the routine and enable **Allow unrestricted branch pushes** so it can push to `main`
+8. Click **Run now** on the routine once to verify
 
 From there: clip articles and drop notes during the day, `git push`, wake up to your synthesized wiki.
 
@@ -106,63 +109,68 @@ Then follow steps 3–8 from the skill walkthrough manually.
 
 ```
 MyVault/
-├── CLAUDE.md                 # The contract. Claude reads this to know what to do.
+├── CLAUDE.md       # The contract. Claude reads this to know what to do.
 ├── Raw/
-│   ├── articles/             # Web Clipper output
-│   └── files/                # Drop PDFs, images, screenshots here
-├── Notes/                    # Your personal notes
-├── Wiki/                     # Claude-maintained knowledge pages
-├── Daily/                    # Nightly recaps
-├── Templates/                # Obsidian templates
-├── log.md                    # Append-only log of what the nightly job did
-├── index.md                  # Wiki index, grouped by category
-├── .gitignore
-└── .github/
-    └── workflows/
-        └── nightly-synthesis.yml    # The nightly job
+│   ├── articles/   # Web Clipper output
+│   └── files/      # Drop PDFs, images, screenshots here
+├── Notes/          # Your personal notes
+├── Wiki/           # Claude-maintained knowledge pages
+├── Daily/          # Nightly recaps
+├── Templates/      # Obsidian templates
+├── log.md          # Append-only log of what the nightly job did
+├── index.md        # Wiki index, grouped by category
+└── .gitignore
 ```
+
+No GitHub Actions workflow. No `ANTHROPIC_API_KEY` secret. The schedule and prompt live on the routine, not in the repo.
 
 ## Tech stack
 
-The scaffolder runs on **Bun + TypeScript** (`scripts/init-vault.ts`). The vault itself is plain markdown — no runtime dependency on Bun, Node, or anything else after scaffolding. The nightly job runs Claude Code via [`anthropics/claude-code-action@v1`](https://github.com/anthropics/claude-code-action) on GitHub-hosted runners.
+The scaffolder runs on **Bun + TypeScript** (`scripts/init-vault.ts`). The vault itself is plain markdown — no runtime dependency on Bun, Node, or anything else after scaffolding. The nightly job runs as a [Claude Code routine](https://docs.claude.com/en/docs/claude-code/routines) on Anthropic-managed cloud infrastructure.
 
 ## The nightly job
 
-Every night at 05:00 UTC (configurable in `.github/workflows/nightly-synthesis.yml`), GitHub runs the workflow. It:
+Every night at 05:00 UTC (or whatever cadence you set when creating the routine), Anthropic's cloud fires the routine. It:
 
-1. Checks out the vault
-2. Uses [`anthropics/claude-code-action@v1`](https://github.com/anthropics/claude-code-action) to run a single prompt: *"Run the nightly job per CLAUDE.md."*
+1. Clones the vault repo on the default branch
+2. Runs a full Claude Code session with the prompt: *"Run the nightly job per CLAUDE.md."*
 3. Claude reads `CLAUDE.md` and follows the synthesis steps — discovers new sources, reads them, decides whether each warrants a wiki page, creates or updates pages, cross-links them, writes the daily recap, and appends an `ingest` entry to `log.md` for every source
-4. A final shell step commits any changes and pushes to `main`
+4. The session commits any changes and pushes back to `main`
 
-The prompt is intentionally tiny. The logic lives in `CLAUDE.md` — if you want to change how synthesis works, you edit that file, not the workflow.
+The prompt is intentionally tiny. The logic lives in `CLAUDE.md` — if you want to change how synthesis works, you edit that file, not the routine.
+
+**Why routines instead of GitHub Actions?** No API key to manage (billed against your Claude subscription), no YAML to maintain, no Actions minutes consumed, and the routine can combine the schedule with API triggers (`curl` to resynthesize on demand) or GitHub-event triggers (resynthesize on `push`). Requires a Pro, Max, Team, or Enterprise Claude plan.
 
 ## Customization
 
 The pattern is load-bearing; the specifics are not.
 
 **Change freely:**
-- The cron schedule (edit `schedule: cron:` in the workflow)
-- The model (`claude_args` in the workflow)
+- The routine schedule (edit on [claude.ai/code/routines](https://claude.ai/code/routines) or via `/schedule update`)
+- The model (routine edit page)
 - Folder names (just stay consistent in `CLAUDE.md`)
 - Page format conventions, tone, section headers
+- Adding API or GitHub-event triggers alongside the schedule
 
 **Don't change without thought:**
 - The Raw / Notes / Wiki split by ownership — this is what makes the system safe
 - The append-only `log.md` with per-file `ingest` entries — the job depends on it to know what's been processed
 - The rule that `Raw/` and `Notes/` are read-only for the system
+- The commit/push at the end of Step 10 — without it, the routine's work never lands in your repo
 
 ## Costs
 
-- **GitHub Actions minutes:** a nightly run typically takes 2–15 minutes depending on how many new sources you've added. Public repos get unlimited minutes; private repos get 2,000 free/month on the free tier.
-- **Claude API tokens:** usually a few thousand to a few hundred thousand tokens per night, depending on how much new content exists. See [pricing](https://claude.com/platform/api).
+- **Routine runs:** each run consumes routine allowance from your Claude subscription. Pro/Max/Team/Enterprise plans have daily routine caps; enable extra usage in **Settings > Billing** to keep running on metered overage.
+- **GitHub storage:** a text vault is a rounding error on any GitHub plan.
+
+No API key charges. No Actions minutes.
 
 ## Prior art & credits
 
 - [Andrej Karpathy's LLM wiki note](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — the original pattern
 - [Obsidian](https://obsidian.md) — the vault UI
-- [Claude Code](https://claude.com/claude-code) — runs locally and in CI
-- [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action) — the GitHub Action this project is built on
+- [Claude Code](https://claude.com/claude-code) — runs locally and as a routine
+- [Claude Code Routines](https://docs.claude.com/en/docs/claude-code/routines) — the scheduler this project is built on
 
 ## License
 

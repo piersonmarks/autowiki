@@ -9,14 +9,13 @@ External services and tools referenced in the setup walkthrough. Verify the user
 - **Web Clipper browser extension:** https://obsidian.md/clipper
   - Works in Chrome, Firefox, Edge, Safari, Arc. The user installs it like any browser extension, then points it at their vault + a destination folder (`Raw/articles/`).
 
-## Claude Code & GitHub
+## Claude Code & Routines
 
 - **Claude Code overview:** https://claude.com/claude-code
 - **Claude Code install:** https://docs.claude.com/en/docs/claude-code/overview
-- **Claude Code GitHub Actions docs:** https://code.claude.com/docs/en/github-actions
-- **Claude Code Action repository:** https://github.com/anthropics/claude-code-action
-- **Claude GitHub App (install on the vault repo):** https://github.com/apps/claude
-- **Anthropic API console (for `ANTHROPIC_API_KEY`):** https://console.anthropic.com
+- **Claude Code Routines docs:** https://docs.claude.com/en/docs/claude-code/routines
+- **Routines management UI:** https://claude.ai/code/routines
+- **Claude Code on the web (cloud environment):** https://docs.claude.com/en/docs/claude-code/claude-code-on-the-web
 - **GitHub CLI (`gh`):** https://cli.github.com
 
 ## Useful Obsidian plugins (optional)

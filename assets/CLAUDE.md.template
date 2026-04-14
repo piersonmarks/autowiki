@@ -116,9 +116,9 @@ When the user opens a Claude session in this vault:
 
 ## Nightly Synthesis Job
 
-Runs daily via a GitHub Action (`.github/workflows/nightly-synthesis.yml`) that uses `anthropics/claude-code-action@v1`. The action checks out the vault repo, runs the workflow below, commits any changes to `Wiki/`, `Daily/`, `log.md`, and `index.md`, and pushes back. The user pulls in the morning to pick up the updates.
+Runs daily as a [Claude Code routine](https://docs.claude.com/en/docs/claude-code/routines) on Anthropic-managed cloud infrastructure. The routine clones the vault repo, runs the workflow below, then commits changes to `Wiki/`, `Daily/`, `log.md`, and `index.md` and pushes back to `main`. The user pulls in the morning to pick up the updates.
 
-The workflow can also be triggered manually (`workflow_dispatch`) or run locally in an interactive Claude session — the steps are identical either way. The prompt that fires the job is simply `Run the nightly job per CLAUDE.md.`
+The routine can also be triggered manually from the routine's detail page ("Run now") or run locally in an interactive Claude session — the steps are identical either way. The prompt that fires the job is simply `Run the nightly job per CLAUDE.md.`
 
 ### Step 1 — Read the rulebook
 
@@ -177,9 +177,19 @@ For every wiki page created or updated and the daily recap, append an entry to `
 
 After all processing is done, re-run Step 2's `find` commands and re-extract INGESTED. Assert that ALL_SOURCES ⊆ INGESTED. If any file is missing, either process it now or append an explicit `- [YYYY-MM-DD] skipped | <path> (reason)` entry so the next run knows it was deliberately passed over. **Never end a run with uncovered files silently.**
 
-### Step 10 — Stop
+### Step 10 — Commit and push
 
-Do not run `git add`, `git commit`, or `git push`. The GitHub Action workflow handles staging, committing, and pushing all changes after the job exits. When running locally in an interactive session, the user will commit and push manually.
+When running as the routine (cloud session), stage all changes, commit with a message like `nightly synthesis: YYYY-MM-DD`, and push to `main`:
+
+```
+git add -A
+git commit -m "nightly synthesis: $(date -u +%Y-%m-%d)"
+git push
+```
+
+If `git status --porcelain` is empty after Step 9, skip the commit — nothing changed. Requires the routine's repository setting **Allow unrestricted branch pushes** to be enabled; otherwise the push will be rejected because routines default to `claude/`-prefixed branches.
+
+When running locally in an interactive session, stop here — the user will commit and push manually.
 
 ### Rules
 

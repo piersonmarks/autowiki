@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
  * init-vault.ts — Scaffold an autowiki: an Obsidian knowledge vault
- * backed by git, with a nightly GitHub Action that synthesizes new sources
- * into a cross-linked wiki.
+ * backed by git, with a nightly Claude Code routine that synthesizes new
+ * sources into a cross-linked wiki.
  *
  * Usage:
  *   bun scripts/init-vault.ts <target-directory> --vault-name "<name>" [options]
@@ -193,17 +193,6 @@ function main(): void {
     writeIfAbsent(join(vaultDir, ".gitignore"), readFileSync(gitignoreSrc, "utf8"), force);
   }
 
-  const workflowDir = join(vaultDir, ".github", "workflows");
-  mkdirSafe(workflowDir);
-  const workflowSrc = join(skillRoot, "assets", "nightly-synthesis.yml.template");
-  if (existsSync(workflowSrc)) {
-    writeIfAbsent(
-      join(workflowDir, "nightly-synthesis.yml"),
-      readFileSync(workflowSrc, "utf8"),
-      force,
-    );
-  }
-
   if (!skipGit) {
     const alreadyRepo = existsSync(join(vaultDir, ".git"));
     try {
@@ -232,11 +221,9 @@ function main(): void {
   console.log(`  1. open ${vaultDir} as a vault in Obsidian`);
   console.log(`  2. install the Obsidian Web Clipper: https://obsidian.md/clipper`);
   console.log(`  3. create a GitHub repo (gh repo create <name> --source=. --private --push)`);
-  console.log(`  4. install the Claude GitHub app: https://github.com/apps/claude`);
-  console.log(`  5. add ANTHROPIC_API_KEY to repo secrets (gh secret set ANTHROPIC_API_KEY)`);
-  console.log(
-    `  6. trigger the workflow manually once to verify (gh workflow run nightly-synthesis.yml)`,
-  );
+  console.log(`  4. in Claude Code, run: /schedule daily at 05:00 UTC: Run the nightly job per CLAUDE.md.`);
+  console.log(`  5. on claude.ai/code/routines, edit the routine and enable "Allow unrestricted branch pushes" for the repo`);
+  console.log(`  6. click "Run now" on the routine once to verify it works`);
 }
 
 main();

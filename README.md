@@ -82,11 +82,11 @@ From there: clip articles and drop notes during the day, `git push`, wake up to 
 
 ## Install (no agent at all)
 
-You can also use the scaffolder directly — useful in CI, or if you don't run an AI coding agent:
+You can also use the scaffolder directly — useful in CI, or if you don't run an AI coding agent. Requires [Bun](https://bun.sh):
 
 ```bash
 git clone https://github.com/piersonmarks/autowiki /tmp/autowiki
-node /tmp/autowiki/scripts/init-vault.js ~/Desktop/MyVault \
+bun /tmp/autowiki/scripts/init-vault.ts ~/Desktop/MyVault \
   --vault-name "My Autowiki"
 ```
 
@@ -121,6 +121,10 @@ MyVault/
     └── workflows/
         └── nightly-synthesis.yml    # The nightly job
 ```
+
+## Tech stack
+
+The scaffolder runs on **Bun + TypeScript** (`scripts/init-vault.ts`). The vault itself is plain markdown — no runtime dependency on Bun, Node, or anything else after scaffolding. The nightly job runs Claude Code via [`anthropics/claude-code-action@v1`](https://github.com/anthropics/claude-code-action) on GitHub-hosted runners.
 
 ## The nightly job
 

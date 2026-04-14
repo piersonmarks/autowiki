@@ -37,16 +37,18 @@ Point the user to **https://obsidian.md** and have them download + install. Wait
 Run the bundled init script:
 
 ```bash
-node <skill-path>/scripts/init-vault.js <target-directory> \
+bun <skill-path>/scripts/init-vault.ts <target-directory> \
   --vault-name "<Human Readable Vault Name>" \
   [--blog-symlink <folder-name>] [--blog-path <path-to-blog-repo>]
 ```
 
 Example:
 ```bash
-node ~/.claude/skills/knowledge-vault/scripts/init-vault.js ~/Desktop/AliceVault \
-  --vault-name "Alice's Knowledge Vault"
+bun ~/.claude/skills/autowiki/scripts/init-vault.ts ~/Desktop/AliceVault \
+  --vault-name "Alice's Autowiki"
 ```
+
+Bun is required (https://bun.sh — `curl -fsSL https://bun.sh/install | bash`). If the user doesn't have bun installed, point them there before running the script.
 
 The script:
 - Creates `Raw/`, `Raw/articles/`, `Raw/files/`, `Notes/`, `Wiki/`, `Daily/`, `Templates/`
@@ -160,4 +162,4 @@ When the user asks to adapt the template, update both the `CLAUDE.md` in their v
 - `assets/CLAUDE.md.template` — the template the init script uses. Read this to understand what gets written into the user's vault.
 - `assets/nightly-synthesis.yml.template` — the GitHub Action workflow. Read this to understand what runs overnight and how the commit/push works.
 - `assets/gitignore.template` — what's excluded from git (Obsidian workspace files, OS junk).
-- `scripts/init-vault.js` — the scaffolding script. Read before running for an unusual target.
+- `scripts/init-vault.ts` — the scaffolding script (Bun + TypeScript). Read before running for an unusual target.

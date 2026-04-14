@@ -1,0 +1,25 @@
+SKILL.md
+  9d70f00b8a255520 2-3,6,8
+README.md
+  9d70f00b8a255520 1-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "e9f32b0d5e6489282d6db3550cde3e22512a082c",
+  "prompts": {
+    "9d70f00b8a255520": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb75262a-ca2c-459a-a8f0-a86b9edff040",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Pierson Marks",
+      "messages": [],
+      "total_additions": 155,
+      "total_deletions": 4,
+      "accepted_lines": 155,
+      "overriden_lines": 0
+    }
+  }
+}

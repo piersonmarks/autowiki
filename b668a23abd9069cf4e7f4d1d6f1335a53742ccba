@@ -1,0 +1,33 @@
+package.json
+  9d70f00b8a255520 1-15
+tsconfig.json
+  9d70f00b8a255520 1-17
+.gitignore
+  9d70f00b8a255520 1-5
+scripts/init-vault.ts
+  9d70f00b8a255520 1-242
+SKILL.md
+  9d70f00b8a255520 40,47-48,51,165
+README.md
+  9d70f00b8a255520 85,89,125-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b668a23abd9069cf4e7f4d1d6f1335a53742ccba",
+  "prompts": {
+    "9d70f00b8a255520": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb75262a-ca2c-459a-a8f0-a86b9edff040",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Pierson Marks",
+      "messages": [],
+      "total_additions": 291,
+      "total_deletions": 6,
+      "accepted_lines": 291,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -37,21 +37,35 @@ The vault is split by **who owns what**:
 
 This split is the whole point: you never worry about Claude overwriting your notes, and Claude never guesses whether a file in `Wiki/` is safe to edit. The nightly job can aggressively rewrite the wiki because `Raw/` and `Notes/` are the authoritative inputs.
 
-## Install (as a Claude Code skill)
+## Install
 
-The recommended way. Clone this repo into your skills folder:
+### Recommended: via [skills.sh](https://skills.sh)
+
+One command, works across Claude Code, Cursor, Codex, OpenCode, and 40+ other agents:
 
 ```bash
-git clone https://github.com/piersonmarks/autowiki ~/.claude/skills/autowiki
+npx skills add piersonmarks/autowiki -g
 ```
 
-Then open Claude Code and say something like:
+The `-g` installs globally so it's available across every project. Drop it if you want to scope the skill to the current project.
+
+Then open your agent and say something like:
 
 ```
 set up an autowiki at ~/Desktop/MyVault
 ```
 
 The skill triggers, walks you through installing Obsidian, scaffolds the vault, wires up the GitHub Action, and hands you the remaining one-click steps (push to GitHub, install the Claude app, add your API key). You never leave the conversation.
+
+### Alternative: manual clone into a Claude Code skills folder
+
+If you'd rather not use the CLI, clone the repo into your skills folder directly:
+
+```bash
+git clone https://github.com/piersonmarks/autowiki ~/.claude/skills/autowiki
+```
+
+Same trigger phrases work from there.
 
 ### What the skill walks you through
 
@@ -66,9 +80,9 @@ The skill triggers, walks you through installing Obsidian, scaffolds the vault, 
 
 From there: clip articles and drop notes during the day, `git push`, wake up to your synthesized wiki.
 
-## Install (manual, no Claude Code)
+## Install (no agent at all)
 
-You can use the scaffolder directly without Claude Code:
+You can also use the scaffolder directly — useful in CI, or if you don't run an AI coding agent:
 
 ```bash
 git clone https://github.com/piersonmarks/autowiki /tmp/autowiki

@@ -4,7 +4,7 @@
 
 Drop articles, notes, and PDFs into an Obsidian vault during the day. A nightly GitHub Action uses Claude to turn the raw inputs into a cross-linked wiki and pushes it back. Wake up, pull, and read what your past self learned.
 
-Inspired by [Andrej Karpathy's LLM wiki pattern](https://karpathy.bearblog.dev/llm-wiki/).
+Inspired by [Andrej Karpathy's LLM wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
 ## How it works
 
@@ -155,7 +155,7 @@ The pattern is load-bearing; the specifics are not.
 
 ## Prior art & credits
 
-- [Andrej Karpathy's LLM wiki note](https://karpathy.bearblog.dev/llm-wiki/) — the original pattern
+- [Andrej Karpathy's LLM wiki note](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — the original pattern
 - [Obsidian](https://obsidian.md) — the vault UI
 - [Claude Code](https://claude.com/claude-code) — runs locally and in CI
 - [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action) — the GitHub Action this project is built on
